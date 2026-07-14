@@ -1,0 +1,18 @@
+# Normalize line endings: LF in the repo for all text so the mod behaves the
+# same on Windows and on Linux dedicated servers.
+* text=auto eol=lf
+
+# Explicit text types
+*.lua   text eol=lf
+*.xml   text eol=lf
+*.md    text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+
+# Binary assets — never touch these
+*.dds   binary
+*.png   binary
+*.zip   binary
+*.i3d   binary
+*.gdm   binary
+*.shapes binary

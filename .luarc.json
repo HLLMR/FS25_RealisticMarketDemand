@@ -1,0 +1,31 @@
+{
+    "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+    "runtime.version": "Lua 5.1",
+    "diagnostics.globals": [
+        "Utils",
+        "Class",
+        "addModEventListener",
+        "g_currentMission",
+        "g_currentModName",
+        "g_currentModDirectory",
+        "g_fillTypeManager",
+        "g_i18n",
+        "SellingStation",
+        "UnloadingStation",
+        "FSCareerMissionInfo",
+        "FillType",
+        "createXMLFile",
+        "loadXMLFile",
+        "saveXMLFile",
+        "delete",
+        "setXMLString",
+        "getXMLString",
+        "setXMLFloat",
+        "getXMLFloat",
+        "setXMLInt",
+        "getXMLInt",
+        "hasXMLProperty",
+        "removeXMLProperty",
+        "fileExists"
+    ]
+}

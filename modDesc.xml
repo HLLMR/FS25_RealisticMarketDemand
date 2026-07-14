@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<modDesc descVersion="106">
+    <author>HLLMR</author>
+    <version>0.1.0.0</version>
+
+    <title>
+        <en>Realistic Market Demand</en>
+    </title>
+
+    <description>
+        <en>
+            <![CDATA[
+Tracks buyer demand per selling station and fill type, and reduces the
+effective sale price as demand is consumed within a monthly period. Prices
+recover when a new period begins.
+
+Version 0.1:
+- Single-player.
+- Monthly demand periods.
+- Demand tracked by sell station and fill type.
+- Continuous price multiplier (no hard sale caps).
+- XML save/load per savegame.
+- Console/log diagnostics prefixed with [RealisticMarketDemand].
+]]>
+        </en>
+    </description>
+
+    <iconFilename>icon_RealisticMarketDemand.dds</iconFilename>
+
+    <multiplayer supported="false"/>
+
+    <!-- Load order matters: pure/util modules first, bootstrap last so it can
+         reference the others when addModEventListener fires loadMap(). -->
+    <extraSourceFiles>
+        <sourceFile filename="scripts/RMDLogging.lua"/>
+        <sourceFile filename="scripts/DemandModel.lua"/>
+        <sourceFile filename="scripts/DemandStore.lua"/>
+        <sourceFile filename="scripts/MarketDemandHooks.lua"/>
+        <sourceFile filename="scripts/RealisticMarketDemand.lua"/>
+    </extraSourceFiles>
+
+</modDesc>

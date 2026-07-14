@@ -1,0 +1,22 @@
+# Packaged mod archives (built for release, not source)
+*.zip
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Lua build/test artifacts
+*.luac
+luacov.stats.out
+luacov.report.out
+
+# Local notes not meant for the repo
+scratch/
+TODO.local.md
