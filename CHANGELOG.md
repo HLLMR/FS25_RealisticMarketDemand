@@ -21,13 +21,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Verified in-game (FS25, 2026-08-02)
 - Both `SellingStation` hooks install with no Lua errors.
-- The `FSCareerMissionInfo.saveToXMLFile` save seam fires and actually writes the
-  per-savegame demand file.
+- **Price-linkage confirmed:** money paid tracks the demand multiplier
+  (e.g. ~€0.207/L paid at mult 0.72 on a ~€0.28/L base). The per-station price in
+  the in-game Prices menu drops accordingly (Grain River Silo €287 → €207 after
+  flooding it with wheat).
+- **Persistence confirmed both ways:** the save seam writes the demand file, and
+  the deferred load restores it on reload (`Loaded demand for 1 station(s)`).
+- Station keying via the placeable `uniqueId` works for pre-placed map stations.
 
-### Still to verify
-- That reducing `getEffectiveFillTypePrice` also reduces the money `sellFillType`
-  pays (price-linkage). Instrumented; confirm from the next sale's diagnostic.
-- Restore-on-load after the deferred-load fix.
+### Balance note
+- Default tuning is gentle: ~156,000 L of one crop at one station only reached
+  mult ~0.72. Consider a lower `litersForFullDrop` and/or floor to make the
+  effect more noticeable (pending a tuning pass).
 
 ### To do before release
 - Add a real `icon_RealisticMarketDemand.dds` (referenced by `modDesc.xml`).

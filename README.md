@@ -12,6 +12,16 @@ sales across stations, across crops, or across months and you keep prices high.
 > **Status: v0.1 — early release.** Single-player only, no custom menu yet.
 > Balancing values are first-pass; feedback very welcome.
 
+## See it in action
+
+Same crop, same moment, across every station — before and after flooding one
+selling point with wheat. Grain River Silo's price collapses from **€287** to
+**€207** while the untouched stations hold steady:
+
+| Before (fresh market) | After (flooded Grain River Silo) |
+|---|---|
+| ![Baseline wheat prices](media/prices-baseline.png) | ![Grain River Silo price dropped after flooding](media/prices-flooded.png) |
+
 ## Features
 
 - 📉 **Demand-based pricing** — price drops continuously as you sell more of a
