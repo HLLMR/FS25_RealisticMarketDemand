@@ -79,8 +79,7 @@ function MarketDemandHooks.install(context)
         function(station, superFunc, farmId, fillDelta, fillTypeIndex, toolType, extraAttributes)
             local preMultiplier = context:getPriceMultiplier(station, fillTypeIndex)
             local price = superFunc(station, farmId, fillDelta, fillTypeIndex, toolType, extraAttributes)
-            context:recordSale(station, fillDelta, fillTypeIndex)
-            context:logSale(station, fillTypeIndex, fillDelta, price, preMultiplier)
+            context:onSale(station, fillDelta, fillTypeIndex, price, preMultiplier)
             return price
         end
     )

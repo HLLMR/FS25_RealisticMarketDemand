@@ -43,6 +43,14 @@ monthly period. Prices recover when a new period begins.
 - Console/log diagnostics.
 - No hard sale caps.
 
+## Non-goals (deliberate scope boundaries)
+
+- **No general economy rebalancing.** A wholesale-below / retail-above market
+  spread was considered and explicitly rejected: it is a flat global margin, a
+  different mechanic from dynamic per-station demand, and it would blur this
+  mod's focused identity and collide with dedicated economy mods. Keep the mod to
+  demand saturation.
+
 ## Architecture
 
 | File | Responsibility | GIANTS deps |

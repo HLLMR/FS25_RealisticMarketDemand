@@ -33,6 +33,9 @@ selling point with wheat. Grain River Silo's price collapses from **€287** to
 - 🗓️ **Monthly recovery** — demand resets each in-game month, so prices bounce
   back. Patience pays.
 - 💾 **Persistent** — demand is saved with your game and restored on load.
+- 🔔 **Point-of-sale feedback** — when a market is saturated, a brief
+  "Saturated market" notice shows roughly how much you left on the table by
+  dumping there, so the penalty is visible, not hidden.
 - 🧾 **Transparent** — everything it does is logged (prefix
   `[RealisticMarketDemand]`), so you can see exactly what's happening.
 
@@ -73,8 +76,8 @@ v0.1 ships with sensible defaults. The two main tuning values live at the top of
 
 | Value | Default | Meaning |
 |-------|---------|---------|
-| `DEFAULT_PRICE_FLOOR` | `0.55` | Lowest fraction of normal price a fully-saturated market pays. |
-| `DEFAULT_LITERS_FOR_FULL_DROP` | `250000` | Liters of one crop sold at one station in a month to reach the floor. |
+| `DEFAULT_PRICE_FLOOR` | `0.40` | Lowest fraction of normal price a fully-saturated market pays. |
+| `DEFAULT_LITERS_FOR_FULL_DROP` | `60000` | Liters of one crop sold at one station in a month to reach the floor. |
 
 An in-game settings menu is planned for a later version. To see per-sale math in
 the log, set `RMDLogging.debugEnabled = true` in `scripts/RMDLogging.lua`.

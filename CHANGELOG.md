@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- Point-of-sale "Saturated market" notification: penalties accumulate per
+  (station, fillType) across an unload and a single toast shows the money lost to
+  saturation once the flow goes idle (debounced). Uses
+  `g_currentMission:showBlinkingWarning`.
+
+### Changed
+- Punchier default tuning so the effect is actually felt: price floor 0.55 → 0.40
+  and litersForFullDrop 250,000 → 60,000 (a few large trailers into one station
+  now visibly tanks its price).
+
+### Decided (scope)
+- Wholesale-below / retail-above market spread is **out of scope** — this mod
+  stays focused on demand saturation. General economy rebalancing is left to
+  dedicated economy mods for compatibility.
+
 ### Fixed
 - Restore-from-savegame no longer relies on `savegameDirectory` being populated
   at `loadMap` (it isn't for existing saves). Loading is now deferred via

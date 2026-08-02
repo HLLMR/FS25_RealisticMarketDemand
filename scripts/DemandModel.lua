@@ -20,11 +20,12 @@
 DemandModel = {}
 local DemandModel_mt = { __index = DemandModel }
 
--- Default tuning. Deliberately conservative for a first pass; expose/adjust
--- later. litersForFullDrop is "how many liters of one fill type sold at one
--- station, within one month, drives the price to the floor".
-DemandModel.DEFAULT_PRICE_FLOOR = 0.55
-DemandModel.DEFAULT_LITERS_FOR_FULL_DROP = 250000
+-- Default tuning. Tuned to be clearly felt: a few large trailers of one crop into
+-- one station within a month noticeably tanks its price. litersForFullDrop is
+-- "how many liters of one fill type sold at one station, within one month, drives
+-- the price to the floor".
+DemandModel.DEFAULT_PRICE_FLOOR = 0.40
+DemandModel.DEFAULT_LITERS_FOR_FULL_DROP = 60000
 
 --- Clamp a value to an inclusive range.
 -- @param number value value to clamp

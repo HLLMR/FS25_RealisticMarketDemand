@@ -10,6 +10,7 @@
         "g_currentModDirectory",
         "g_fillTypeManager",
         "g_i18n",
+        "g_time",
         "SellingStation",
         "UnloadingStation",
         "FSCareerMissionInfo",
