@@ -5,7 +5,13 @@ rule against AI-generated or externally synthesized imagery** — these must be
 genuine in-game captures. The challenge with a script mod is making an invisible
 mechanic *visible*, so every shot should show the **price effect**, not scenery.
 
-Set FS25 to 1600×900 (or crop to it). Hide unnecessary HUD clutter if possible.
+Capture at **16:9 (shoot 1920×1080, downscale to 1600×900)** — an ultrawide
+(21:9) capture has to be cropped and loses either the nav or the chart.
+
+**Best surface: the in-game Prices menu** (Statistics → Prices). It lists one
+commodity's **selling price across every station at once**, which is exactly the
+value our mod scales — so the flooded station's number visibly drops below the
+others. This one screen carries the whole before/after story.
 
 ## How to stage the effect quickly
 1. Enable the mod and (optionally) Easy Dev Controls to give yourself a large
@@ -18,23 +24,20 @@ Set FS25 to 1600×900 (or crop to it). Hide unnecessary HUD clutter if possible.
 
 ## The shots
 
-### Shot 1 — "Baseline price" (required)
-The selling station's price display for the chosen crop **before** any dumping,
-showing a healthy/normal price per liter. This is the "before".
-- Frame: the in-world price trigger or the prices overview, crop + price legible.
+### Shot 1 — "Baseline" (required)
+Prices menu, one crop (wheat reads well) selected, **before** any dumping — all
+stations clustered at similar prices. This is the "before".
 
-### Shot 2 — "Flooded price" (required, the money shot)
-The **same station, same crop, after** heavy selling — price visibly reduced.
-Ideally composed to match Shot 1's framing so the before/after is obvious at a
-glance.
-- Bonus: if the UI shows it, capture the moment mid-sale with the lower payout.
+### Shot 2 — "Flooded" (required, the money shot)
+The **same Prices screen after** heavy selling at one station — that station's
+price for the crop now sits **clearly below** the others, which held. Same
+framing as Shot 1 so the before/after is obvious at a glance. This single pair is
+the strongest possible demonstration: same crop, one flooded station, per-station
+demand, all in one view.
 
-### Shot 3 — "Spread your sales" (required)
-Two things that make the mechanic legible:
-- Option A: the **same crop at two different stations** showing **different**
-  prices (one flooded, one fresh) — demonstrates per-station demand.
-- Option B: the **prices overview** with the flooded crop clearly lower than its
-  neighbors at that station.
+### Shot 3 — "In the world" (required)
+A loaded trailer tipping the crop at the sell point, or the in-world price
+trigger — ties the abstract number to actual gameplay.
 
 ### Shot 4 — "In action" (optional hero)
 A loaded trailer tipping the crop at the sell point, price panel visible — a
