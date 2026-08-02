@@ -6,12 +6,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Notes / to verify
-- Confirm in-game that reducing `SellingStation:getEffectiveFillTypePrice` also
-  reduces the money paid by `sellFillType` (the two are assumed linked).
-- Confirm the `FSCareerMissionInfo.saveToXMLFile` save seam fires (not present in
-  the stripped SDK source).
+### Fixed
+- Restore-from-savegame no longer relies on `savegameDirectory` being populated
+  at `loadMap` (it isn't for existing saves). Loading is now deferred via
+  `ensureLoaded()` and retried lazily before the first price lookup or sale.
+
+### Changed
+- Hook double-install guard now marks the `SellingStation` class itself, so a
+  mod-script reload (e.g. Easy Dev Controls) can't stack a second wrapper.
+- Added per-method nil checks before installing the `SellingStation` overwrites.
+- Added a per-sale diagnostic log (behind `RMDLogging.debugEnabled`, temporarily
+  ON for v0.1 validation) printing liters, price paid, per-liter paid, and the
+  applied multiplier.
+
+### Verified in-game (FS25, 2026-08-02)
+- Both `SellingStation` hooks install with no Lua errors.
+- The `FSCareerMissionInfo.saveToXMLFile` save seam fires and actually writes the
+  per-savegame demand file.
+
+### Still to verify
+- That reducing `getEffectiveFillTypePrice` also reduces the money `sellFillType`
+  pays (price-linkage). Instrumented; confirm from the next sale's diagnostic.
+- Restore-on-load after the deferred-load fix.
+
+### To do before release
 - Add a real `icon_RealisticMarketDemand.dds` (referenced by `modDesc.xml`).
+- Set `RMDLogging.debugEnabled` back to `false`.
 
 ## [0.1.0] - 2026-07-14
 

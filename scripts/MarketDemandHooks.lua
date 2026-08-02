@@ -35,13 +35,22 @@ MarketDemandHooks.isInstalled = false
 --   context:recordSale(station, fillDelta, fillTypeIndex) -> void
 -- @return boolean success true if both hooks were installed
 function MarketDemandHooks.install(context)
-    if MarketDemandHooks.isInstalled then
-        RMDLogging.warn("Hooks already installed; skipping re-install")
+    if SellingStation == nil then
+        RMDLogging.error("SellingStation class not found; cannot install hooks")
         return false
     end
 
-    if SellingStation == nil then
-        RMDLogging.error("SellingStation class not found; cannot install hooks")
+    -- Guard against double-wrapping. The marker lives on the SellingStation class
+    -- itself (not on this module), so it survives a mod-script reload (e.g. via
+    -- Easy Dev Controls) that would otherwise reset a module-level flag and
+    -- stack a second wrapper on top of the first.
+    if SellingStation.rmdHooksInstalled then
+        RMDLogging.warn("Hooks already present on SellingStation; skipping re-install")
+        return false
+    end
+
+    if SellingStation.getEffectiveFillTypePrice == nil or SellingStation.sellFillType == nil then
+        RMDLogging.error("Expected SellingStation methods missing; cannot install hooks")
         return false
     end
 
@@ -61,17 +70,23 @@ function MarketDemandHooks.install(context)
     )
     RMDLogging.info("Installed SellingStation.getEffectiveFillTypePrice hook")
 
-    -- 2) Demand recording. Consume demand equal to the liters just sold.
+    -- 2) Demand recording. Consume demand equal to the liters just sold. The
+    --    multiplier is read BEFORE superFunc so the diagnostic reflects the
+    --    multiplier that actually applied to this sale (recordSale then advances
+    --    demand for the next one).
     SellingStation.sellFillType = Utils.overwrittenFunction(
         SellingStation.sellFillType,
         function(station, superFunc, farmId, fillDelta, fillTypeIndex, toolType, extraAttributes)
+            local preMultiplier = context:getPriceMultiplier(station, fillTypeIndex)
             local price = superFunc(station, farmId, fillDelta, fillTypeIndex, toolType, extraAttributes)
             context:recordSale(station, fillDelta, fillTypeIndex)
+            context:logSale(station, fillTypeIndex, fillDelta, price, preMultiplier)
             return price
         end
     )
     RMDLogging.info("Installed SellingStation.sellFillType hook")
 
+    SellingStation.rmdHooksInstalled = true
     MarketDemandHooks.isInstalled = true
     return true
 end

@@ -47,14 +47,12 @@ function RealisticMarketDemand:loadMap(filename)
     })
     self.store = DemandStore.new(self.model)
     self.warnedMissingKey = false
+    self.loaded = false
 
-    -- Load any persisted demand for this savegame before hooks go live.
-    local savePath = self:getSavePath()
-    if savePath ~= nil then
-        self.store:loadFromFile(savePath)
-    else
-        RMDLogging.warn("No savegame directory yet; starting with empty demand")
-    end
+    -- Try to restore persisted demand now. For existing savegames the savegame
+    -- directory is often NOT populated yet at loadMap time (observed in-game), so
+    -- ensureLoaded() retries lazily before the first price lookup or sale.
+    self:ensureLoaded()
 
     -- The hooks call back into this instance as their `context`.
     MarketDemandHooks.install(self)
@@ -70,6 +68,7 @@ function RealisticMarketDemand:deleteMap()
     RMDLogging.info("Shutting down")
     self.model = nil
     self.store = nil
+    self.loaded = false
 end
 
 ------------------------------------------------------------
@@ -84,6 +83,7 @@ function RealisticMarketDemand:getPriceMultiplier(station, fillTypeIndex)
     if self.store == nil then
         return 1.0
     end
+    self:ensureLoaded()
 
     local stationKey = self:getStationKey(station)
     local fillTypeName = self:getFillTypeName(fillTypeIndex)
@@ -105,6 +105,7 @@ function RealisticMarketDemand:recordSale(station, fillDelta, fillTypeIndex)
     if fillDelta == nil or fillDelta <= 0 then
         return
     end
+    self:ensureLoaded()
 
     local stationKey = self:getStationKey(station)
     local fillTypeName = self:getFillTypeName(fillTypeIndex)
@@ -114,16 +115,49 @@ function RealisticMarketDemand:recordSale(station, fillDelta, fillTypeIndex)
 
     local period = self:getCurrentPeriod()
     self.store:recordSale(stationKey, fillTypeName, fillDelta, period)
+end
 
-    RMDLogging.debug("Sold %.0f l of %s at %s (period %d) -> consumed %.0f l, mult %.3f",
-        fillDelta, fillTypeName, stationKey, period,
-        self.store:getConsumedLiters(stationKey, fillTypeName),
-        self.store:getMultiplier(stationKey, fillTypeName, period))
+--- Diagnostic log for a single sale (validation aid). Off unless debug enabled.
+-- Logs the price the game actually paid alongside our pre-sale multiplier, so
+-- the price-linkage assumption can be confirmed from the log.
+-- @param table station the SellingStation instance
+-- @param number fillTypeIndex runtime fill type index
+-- @param number fillDelta liters sold
+-- @param number pricePaid money returned by the vanilla sellFillType
+-- @param number multiplier the demand multiplier that applied to this sale
+function RealisticMarketDemand:logSale(station, fillTypeIndex, fillDelta, pricePaid, multiplier)
+    if not RMDLogging.debugEnabled then
+        return
+    end
+    local stationKey = self:getStationKey(station) or "?"
+    local fillTypeName = self:getFillTypeName(fillTypeIndex) or "?"
+    local perLiter = (fillDelta ~= nil and fillDelta > 0) and (pricePaid or 0) / fillDelta or 0
+    RMDLogging.debug(
+        "SALE station=%s fill=%s liters=%.0f paid=%.0f perLiterPaid=%.4f mult=%.4f consumed=%.0f",
+        stationKey, fillTypeName, fillDelta or 0, pricePaid or 0, perLiter, multiplier or 1.0,
+        self.store:getConsumedLiters(stationKey, fillTypeName))
 end
 
 ------------------------------------------------------------
 -- save / load wiring
 ------------------------------------------------------------
+
+--- Load persisted demand once the savegame directory is available. Safe to call
+-- repeatedly and from hot paths: it is a no-op after the first successful load
+-- (or if the directory is not ready yet, it simply retries on the next call).
+function RealisticMarketDemand:ensureLoaded()
+    if self.loaded or self.store == nil then
+        return
+    end
+    local savePath = self:getSavePath()
+    if savePath == nil then
+        -- Savegame directory not ready yet (common at loadMap for existing
+        -- saves); try again on the next price lookup or sale.
+        return
+    end
+    self.store:loadFromFile(savePath)
+    self.loaded = true
+end
 
 --- Absolute path of this mod's per-savegame demand file, or nil if unavailable.
 -- @return string? path

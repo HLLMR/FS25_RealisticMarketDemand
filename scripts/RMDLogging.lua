@@ -12,7 +12,9 @@ RMDLogging.PREFIX = "[RealisticMarketDemand]"
 
 -- Set to true to see per-sale demand math in the log. Kept off by default so a
 -- normal play session is not spammed.
-RMDLogging.debugEnabled = false
+-- NOTE: temporarily ON during v0.1 in-game validation; set back to false before
+-- release packaging.
+RMDLogging.debugEnabled = true
 
 --- Internal: format and print a single line at a given level.
 -- @param string level level tag, e.g. "INFO"
