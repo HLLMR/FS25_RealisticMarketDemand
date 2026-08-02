@@ -1,5 +1,6 @@
 # Packaged mod archives (built for release, not source)
 *.zip
+dist/
 
 # OS cruft
 .DS_Store
