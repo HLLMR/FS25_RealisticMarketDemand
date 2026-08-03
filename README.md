@@ -22,6 +22,11 @@ selling points with wheat. Grain River Silo's price collapses from **€287** to
 |---|---|
 | ![Baseline wheat prices](media/prices-baseline.png) | ![Grain River Silo price dropped after flooding](media/prices-flooded.png) |
 
+And at the point of sale, the penalty shows right in the income HUD — next to your
+harvest income, so you can see exactly what saturating the market cost you:
+
+![Saturated market penalty shown in the income HUD](media/penalty-in-action.png)
+
 ## Features
 
 - 📉 **Demand-based pricing** — price drops continuously as you sell more of a
@@ -42,9 +47,10 @@ selling points with wheat. Grain River Silo's price collapses from **€287** to
 ## How it works
 
 Within a monthly period, each `(station, fill type)` pair accumulates the liters
-you've sold. The price multiplier falls linearly from `1.0` toward a floor
-(default **0.55**, i.e. down to 55% of the normal price) as consumption
-approaches a threshold (default **250,000 L**), then holds at the floor:
+you've sold. The price multiplier falls linearly from `1.0` toward a floor as
+consumption approaches a threshold, then holds at the floor. Both the floor and
+the threshold follow your economic difficulty (see [Difficulty](#difficulty)
+below — e.g. Normal is a **0.50** floor reached at **150,000 L**):
 
 ```
 multiplier = 1 − (1 − floor) × min(litersSold / litersForFullDrop, 1)
