@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate modDesc.xml is well-formed
+        run: |
+          python3 - <<'PY'
+          import xml.dom.minidom
+          xml.dom.minidom.parse("modDesc.xml")
+          print("modDesc.xml: well-formed")
+          PY
+
+      - name: Set up Lua 5.1
+        run: sudo apt-get update && sudo apt-get install -y lua5.1
+
+      - name: Run pure-math unit tests
+        run: lua5.1 tests/DemandModel.test.lua

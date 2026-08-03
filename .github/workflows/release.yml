@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to (re)release, e.g. v0.1.0'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Resolve tag name
+        id: tag
+        run: echo "name=${{ github.event.inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build ModHub-ready zip (modDesc.xml at root, runtime files only)
+        run: |
+          set -euo pipefail
+          MOD=FS25_RealisticMarketDemand
+          mkdir -p dist
+          rm -f "dist/$MOD.zip"
+          zip -X "dist/$MOD.zip" modDesc.xml LICENSE
+          [ -f icon_RealisticMarketDemand.dds ] && zip -X "dist/$MOD.zip" icon_RealisticMarketDemand.dds
+          zip -X "dist/$MOD.zip" scripts/*.lua
+          if [ -d l10n ]; then zip -r -X "dist/$MOD.zip" l10n; fi
+          echo "--- archive contents ---"
+          unzip -l "dist/$MOD.zip"
+
+      - name: Extract release notes from CHANGELOG
+        run: |
+          python3 - <<'PY' > RELEASE_NOTES.md
+          import re
+          tag = "${{ steps.tag.outputs.name }}".lstrip("v")
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          m = re.search(r"^## \[%s\][^\n]*\n(.*?)(?=^## \[|^\[|\Z)" % re.escape(tag),
+                        text, re.S | re.M)
+          print((m.group(1).strip() if m else "See CHANGELOG.md for details."))
+          PY
+          echo "--- release notes ---"
+          cat RELEASE_NOTES.md
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          name: ${{ steps.tag.outputs.name }}
+          body_path: RELEASE_NOTES.md
+          files: dist/FS25_RealisticMarketDemand.zip
