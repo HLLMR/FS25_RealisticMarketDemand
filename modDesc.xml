@@ -39,4 +39,10 @@ Version 0.1:
         <sourceFile filename="scripts/RealisticMarketDemand.lua"/>
     </extraSourceFiles>
 
+    <l10n>
+        <text name="rmd_saturatedMarket">
+            <en>Saturated market</en>
+        </text>
+    </l10n>
+
 </modDesc>

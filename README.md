@@ -14,9 +14,9 @@ sales across stations, across crops, or across months and you keep prices high.
 
 ## See it in action
 
-Same crop, same moment, across every station — before and after flooding one
-selling point with wheat. Grain River Silo's price collapses from **€287** to
-**€207** while the untouched stations hold steady:
+Same crop, same moment, across every station — before and after flooding
+selling points with wheat. Grain River Silo's price collapses from **€287** to
+**€115** while the untouched stations hold steady:
 
 | Before (fresh market) | After (flooded Grain River Silo) |
 |---|---|
@@ -33,9 +33,9 @@ selling point with wheat. Grain River Silo's price collapses from **€287** to
 - 🗓️ **Monthly recovery** — demand resets each in-game month, so prices bounce
   back. Patience pays.
 - 💾 **Persistent** — demand is saved with your game and restored on load.
-- 🔔 **Point-of-sale feedback** — when a market is saturated, a brief
-  "Saturated market" notice shows roughly how much you left on the table by
-  dumping there, so the penalty is visible, not hidden.
+- 🔔 **Point-of-sale feedback** — a "Saturated market" line appears in the income
+  HUD right next to your harvest income, showing exactly how much you left on the
+  table by dumping into a flooded market. The penalty is visible, not hidden.
 - 🧾 **Transparent** — everything it does is logged (prefix
   `[RealisticMarketDemand]`), so you can see exactly what's happening.
 

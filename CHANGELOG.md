@@ -7,10 +7,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
-- Point-of-sale "Saturated market" notification: penalties accumulate per
-  (station, fillType) across an unload and a single toast shows the money lost to
-  saturation once the flow goes idle (debounced). Uses
-  `g_currentMission:showBlinkingWarning`.
+- "Saturated market" penalty line in the income HUD (next to Harvest Income),
+  showing the money lost to saturation. Uses a custom `MoneyType.register` finance
+  category plus display-only `g_currentMission:addMoneyChange` — which does NOT
+  change the balance (already reduced by the price hook), so no double-charge.
+  Per-tick calls of the same money type auto-aggregate into one line, so no
+  debounce is needed. (Replaced the earlier center-screen `showBlinkingWarning`
+  toast, which fired but was easy to miss and in the wrong place.)
 
 ### Changed
 - Punchier default tuning so the effect is actually felt: price floor 0.55 → 0.40

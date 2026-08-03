@@ -15,6 +15,7 @@
         "UnloadingStation",
         "FSCareerMissionInfo",
         "FillType",
+        "MoneyType",
         "createXMLFile",
         "loadXMLFile",
         "saveXMLFile",

@@ -31,13 +31,6 @@ RealisticMarketDemand.MOD_NAME = g_currentModName
 RealisticMarketDemand.MOD_DIRECTORY = g_currentModDirectory
 RealisticMarketDemand.SAVE_FILENAME = "realisticMarketDemand.xml"
 
--- Saturated-market penalty notification tuning. Sales fire per-tick during an
--- unload, so penalties accumulate per (station, fillType) and a single toast is
--- shown once the flow has been idle for DEBOUNCE_MS.
-RealisticMarketDemand.NOTIFY_DEBOUNCE_MS = 1200
-RealisticMarketDemand.NOTIFY_DURATION_MS = 3000
-RealisticMarketDemand.NOTIFY_MIN_AMOUNT = 100
-
 --- Called by the mod event system once the map has finished loading.
 -- @param string filename the loaded map filename (unused)
 function RealisticMarketDemand:loadMap(filename)
@@ -55,9 +48,17 @@ function RealisticMarketDemand:loadMap(filename)
     self.store = DemandStore.new(self.model)
     self.warnedMissingKey = false
     self.loaded = false
-    -- self.pendingPenalty[key] = { amount, fillTypeName, lastTime } accumulates
-    -- the money lost to saturation across an unload, flushed to a toast in update().
-    self.pendingPenalty = {}
+
+    -- Register a display-only finance category so the money lost to saturation
+    -- shows as its own labelled line in the income HUD (next to "Harvest Income").
+    -- Same pattern as GIANTS' precisionFarming (EnvironmentalScore.lua:42-43).
+    self.penaltyMoneyType = nil
+    if MoneyType ~= nil and MoneyType.register ~= nil then
+        self.penaltyMoneyType = MoneyType.register("other", "rmd_saturatedMarket", RealisticMarketDemand.MOD_NAME)
+        RMDLogging.info("Registered 'Saturated market' finance category")
+    else
+        RMDLogging.warn("MoneyType.register unavailable; saturation penalty won't show in the finance HUD")
+    end
 
     -- Try to restore persisted demand now. For existing savegames the savegame
     -- directory is often NOT populated yet at loadMap time (observed in-game), so
@@ -79,7 +80,6 @@ function RealisticMarketDemand:deleteMap()
     self.model = nil
     self.store = nil
     self.loaded = false
-    self.pendingPenalty = {}
 end
 
 ------------------------------------------------------------
@@ -105,14 +105,15 @@ function RealisticMarketDemand:getPriceMultiplier(station, fillTypeIndex)
     return self.store:getMultiplier(stationKey, fillTypeName, self:getCurrentPeriod())
 end
 
---- Handle a completed sale tick: consume demand and accumulate the saturation
--- penalty for the point-of-sale toast. Server-only, write path.
+--- Handle a completed sale tick: consume demand and surface the saturation
+-- penalty in the finance HUD. Server-only, write path.
 -- @param table station the SellingStation instance
+-- @param number farmId farm that made the sale
 -- @param number fillDelta liters just sold
 -- @param number fillTypeIndex runtime fill type index
 -- @param number pricePaid money the vanilla sellFillType actually paid
 -- @param number preMultiplier the demand multiplier that applied to this sale
-function RealisticMarketDemand:onSale(station, fillDelta, fillTypeIndex, pricePaid, preMultiplier)
+function RealisticMarketDemand:onSale(station, farmId, fillDelta, fillTypeIndex, pricePaid, preMultiplier)
     if not self.isServer or self.store == nil then
         return
     end
@@ -129,7 +130,7 @@ function RealisticMarketDemand:onSale(station, fillDelta, fillTypeIndex, pricePa
 
     local period = self:getCurrentPeriod()
     self.store:recordSale(stationKey, fillTypeName, fillDelta, period)
-    self:accumulatePenalty(stationKey, fillTypeName, pricePaid, preMultiplier)
+    self:showSaturationPenalty(farmId, pricePaid, preMultiplier)
 
     RMDLogging.debug(
         "SALE station=%s fill=%s liters=%.0f paid=%.0f mult=%.4f consumed=%.0f",
@@ -137,14 +138,22 @@ function RealisticMarketDemand:onSale(station, fillDelta, fillTypeIndex, pricePa
         self.store:getConsumedLiters(stationKey, fillTypeName))
 end
 
---- Accumulate the money lost to saturation for this sale tick. The penalty is
--- the difference between what a fresh market would have paid and what was paid:
--- pricePaid / mult - pricePaid. Only tracked when demand actually reduced price.
--- @param string stationKey stable station key
--- @param string fillTypeName fill type name
+--- Show the money lost to saturation as a labelled line in the finance HUD, next
+-- to "Harvest Income". Uses addMoneyChange, which is DISPLAY-ONLY: Motorized.lua
+-- pairs addMoney (balance) with addMoneyChange (display) for fuel, so this does
+-- NOT alter the balance -- which the price hook has already reduced. Per-tick
+-- calls of the same money type aggregate into one growing line, so no debounce is
+-- needed. Penalty = what a fresh market would have paid minus what was paid.
+-- @param number farmId farm to credit the display line to
 -- @param number pricePaid money paid this tick
 -- @param number preMultiplier the multiplier that applied (< 1 means saturated)
-function RealisticMarketDemand:accumulatePenalty(stationKey, fillTypeName, pricePaid, preMultiplier)
+function RealisticMarketDemand:showSaturationPenalty(farmId, pricePaid, preMultiplier)
+    if self.penaltyMoneyType == nil or farmId == nil then
+        return
+    end
+    if g_currentMission == nil or g_currentMission.addMoneyChange == nil then
+        return
+    end
     if pricePaid == nil or pricePaid <= 0 then
         return
     end
@@ -153,44 +162,7 @@ function RealisticMarketDemand:accumulatePenalty(stationKey, fillTypeName, price
     end
 
     local penalty = pricePaid * (1.0 - preMultiplier) / preMultiplier
-    local key = stationKey .. "|" .. fillTypeName
-    local pending = self.pendingPenalty[key]
-    if pending == nil then
-        pending = { amount = 0, fillTypeName = fillTypeName }
-        self.pendingPenalty[key] = pending
-    end
-    pending.amount = pending.amount + penalty
-    pending.lastTime = g_time
-end
-
---- Mod event callback. Flushes accumulated saturation penalties to a toast once
--- the unload flow for a (station, fillType) has been idle past the debounce.
--- @param number dt frame delta in ms (unused; we debounce on g_time)
-function RealisticMarketDemand:update(dt)
-    if self.pendingPenalty == nil then
-        return
-    end
-    for key, pending in pairs(self.pendingPenalty) do
-        if g_time - pending.lastTime > RealisticMarketDemand.NOTIFY_DEBOUNCE_MS then
-            if pending.amount >= RealisticMarketDemand.NOTIFY_MIN_AMOUNT then
-                self:showPenaltyNotification(pending.fillTypeName, pending.amount)
-            end
-            self.pendingPenalty[key] = nil
-        end
-    end
-end
-
---- Show a brief on-screen "saturated market" penalty notice.
--- @param string fillTypeName fill type name
--- @param number amount money lost to saturation this unload
-function RealisticMarketDemand:showPenaltyNotification(fillTypeName, amount)
-    if g_currentMission == nil or g_currentMission.showBlinkingWarning == nil then
-        return
-    end
-    -- TODO(l10n): move to an l10n string and use g_i18n:formatMoney for currency.
-    local text = string.format("Saturated market (%s): -%d", tostring(fillTypeName), math.floor(amount))
-    g_currentMission:showBlinkingWarning(text, RealisticMarketDemand.NOTIFY_DURATION_MS)
-    RMDLogging.debug("Penalty notice: %s", text)
+    g_currentMission:addMoneyChange(-penalty, farmId, self.penaltyMoneyType, true)
 end
 
 ------------------------------------------------------------
