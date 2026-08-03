@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **Difficulty preset** setting (Easy / Normal / Hard) mapping to price floor +
+  litersForFullDrop, applied live and persisted per savegame. Injected into the
+  in-game General Settings menu (`scripts/RMDSettings.lua`, defensive: any GUI
+  failure leaves the mechanic untouched, and it dumps the settings-frame tree to
+  the debug log on first open to verify the injection target on each build).
+  Presets: easy 0.60/120k L, normal 0.45/70k L, hard 0.30/40k L.
 - "Saturated market" penalty line in the income HUD (next to Harvest Income),
   showing the money lost to saturation. Uses a custom `MoneyType.register` finance
   category plus display-only `g_currentMission:addMoneyChange` — which does NOT

@@ -20,12 +20,33 @@
 DemandModel = {}
 local DemandModel_mt = { __index = DemandModel }
 
--- Default tuning. Tuned to be clearly felt: a few large trailers of one crop into
--- one station within a month noticeably tanks its price. litersForFullDrop is
--- "how many liters of one fill type sold at one station, within one month, drives
--- the price to the floor".
-DemandModel.DEFAULT_PRICE_FLOOR = 0.40
-DemandModel.DEFAULT_LITERS_FOR_FULL_DROP = 60000
+-- Default tuning matches the "normal" preset below. litersForFullDrop is "how
+-- many liters of one fill type sold at one station, within one month, drives the
+-- price to the floor".
+DemandModel.DEFAULT_PRICE_FLOOR = 0.45
+DemandModel.DEFAULT_LITERS_FOR_FULL_DROP = 70000
+
+-- Difficulty presets exposed in the settings menu. Ordered easy -> hard. `floor`
+-- is the lowest price fraction a saturated market pays; `litersForFullDrop` is
+-- how much of one crop at one station reaches that floor within a month.
+DemandModel.PRESETS = {
+    { key = "easy",   floor = 0.60, litersForFullDrop = 120000 },
+    { key = "normal", floor = 0.45, litersForFullDrop = 70000 },
+    { key = "hard",   floor = 0.30, litersForFullDrop = 40000 },
+}
+DemandModel.DEFAULT_PRESET = "normal"
+
+--- Look up a preset by key.
+-- @param string key "easy" | "normal" | "hard"
+-- @return table? preset, number? index
+function DemandModel.getPresetByKey(key)
+    for i, preset in ipairs(DemandModel.PRESETS) do
+        if preset.key == key then
+            return preset, i
+        end
+    end
+    return nil, nil
+end
 
 --- Clamp a value to an inclusive range.
 -- @param number value value to clamp
@@ -58,6 +79,23 @@ function DemandModel.new(config)
     self.priceFloor = DemandModel.clamp(self.priceFloor, 0, 1)
 
     return self
+end
+
+--- Apply a difficulty preset in place (used by the settings menu). Falls back to
+-- the default preset if the key is unknown.
+-- @param string key "easy" | "normal" | "hard"
+-- @return string appliedKey the preset key actually applied
+function DemandModel:applyPreset(key)
+    local preset = DemandModel.getPresetByKey(key) or DemandModel.getPresetByKey(DemandModel.DEFAULT_PRESET)
+    if preset == nil then
+        return self.presetKey
+    end
+    self.priceFloor = DemandModel.clamp(preset.floor, 0, 1)
+    if preset.litersForFullDrop ~= nil and preset.litersForFullDrop > 0 then
+        self.litersForFullDrop = preset.litersForFullDrop
+    end
+    self.presetKey = preset.key
+    return preset.key
 end
 
 --- Compute the price multiplier for a given amount of consumed demand.

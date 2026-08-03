@@ -33,6 +33,9 @@ function DemandStore.new(model)
     self.model = model
     -- self.entries[stationKey][fillTypeName] = { consumedLiters=number, period=number }
     self.entries = {}
+    -- Chosen difficulty preset key ("easy"|"normal"|"hard"), persisted with the
+    -- savegame so the setting survives reloads.
+    self.presetKey = nil
     return self
 end
 
@@ -120,6 +123,10 @@ function DemandStore:saveToFile(path)
         return false
     end
 
+    if self.presetKey ~= nil then
+        setXMLString(xmlId, DemandStore.ROOT_NODE .. "#preset", self.presetKey)
+    end
+
     local stationIndex = 0
     for stationKey, fillTypes in pairs(self.entries) do
         local stationPath = string.format("%s.station(%d)", DemandStore.ROOT_NODE, stationIndex)
@@ -154,6 +161,7 @@ function DemandStore:loadFromFile(path)
     end
 
     self:reset()
+    self.presetKey = getXMLString(xmlId, DemandStore.ROOT_NODE .. "#preset")
 
     local stationIndex = 0
     while true do
