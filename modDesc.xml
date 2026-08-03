@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<modDesc descVersion="106">
+<modDesc descVersion="111">
     <author>HLLMR</author>
-    <version>0.1.0.0</version>
+    <version>1.0.0.0</version>
 
     <title>
         <en>Realistic Market Demand</en>
@@ -19,7 +19,7 @@ sales across stations, crops, or months to keep prices high.
 - "Saturated market" penalty shown in the income HUD
 - Strength scales with your savegame's economic difficulty (Easy/Normal/Hard)
 - Saved with your game
-- Single-player. PC only.
+- Single-player feature (loads in multiplayer but stays inactive). PC only.
 
 Open source: https://github.com/HLLMR/FS25_RealisticMarketDemand
 ]]>
@@ -36,7 +36,7 @@ Früchte oder Monate, um die Preise hoch zu halten.
 - "Gesättigter Markt"-Abzug im Einnahmen-HUD
 - Stärke richtet sich nach dem wirtschaftlichen Schwierigkeitsgrad des Spielstands (Leicht/Normal/Schwer)
 - Wird mit dem Spielstand gespeichert
-- Einzelspieler. Nur PC.
+- Einzelspieler-Funktion (lädt im Mehrspieler, bleibt dort aber inaktiv). Nur PC.
 
 Open Source: https://github.com/HLLMR/FS25_RealisticMarketDemand
 ]]>
@@ -45,7 +45,7 @@ Open Source: https://github.com/HLLMR/FS25_RealisticMarketDemand
 
     <iconFilename>icon_RealisticMarketDemand.dds</iconFilename>
 
-    <multiplayer supported="false"/>
+    <multiplayer supported="true"/>
 
     <!-- Load order matters: pure/util modules first, bootstrap last so it can
          reference the others when addModEventListener fires loadMap(). -->

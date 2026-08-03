@@ -89,27 +89,21 @@ price to that floor. Tweak the numbers at the top of `scripts/DemandModel.lua`
 
 ## Compatibility
 
-- **Farming Simulator 25.**
-- **Single-player** in v0.1 (`multiplayer` is disabled in the manifest).
+- **Farming Simulator 25** (PC).
+- **Single-player feature.** The mod is multiplayer-compatible — it loads in MP
+  but stays inactive there (demand pricing applies in single-player only). Full
+  MP support is planned for a later version.
 - Coexists with the base game's dynamic pricing and "great demand" events.
 - Should be compatible with most maps and selling stations, since it hooks the
   standard `SellingStation` class rather than any specific map. Conflicts are
   most likely with other mods that overwrite `SellingStation:sellFillType` or
   `SellingStation:getEffectiveFillTypePrice`.
 
-## Known limitations (v0.1)
+## Known limitations
 
-This is an early scaffold; two behaviors still need in-game confirmation and are
-tracked in the [CHANGELOG](CHANGELOG.md):
-
-1. **Price linkage.** The design assumes the money paid by `sellFillType` derives
-   from `getEffectiveFillTypePrice`. If a sale's payout doesn't change, the
-   reduction will be moved into the sell hook directly.
-2. **Save trigger.** Persistence uses the community-standard
-   `FSCareerMissionInfo.saveToXMLFile` seam, which needs verification against
-   this build.
-
-No custom GUI and no in-game configuration menu yet. No custom 3D assets.
+- **Single-player only** for now — inactive in multiplayer (see Compatibility).
+- No custom in-game settings menu (difficulty follows the savegame's economic
+  difficulty instead). No custom 3D assets.
 
 ## Contributing
 

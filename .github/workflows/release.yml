@@ -30,7 +30,9 @@ jobs:
           MOD=FS25_RealisticMarketDemand
           mkdir -p dist
           rm -f "dist/$MOD.zip"
-          zip -X "dist/$MOD.zip" modDesc.xml LICENSE
+          # LICENSE is intentionally not bundled (game doesn't load it; TestRunner
+          # ObsoleteFiles flags it). It stays in the repo.
+          zip -X "dist/$MOD.zip" modDesc.xml
           [ -f icon_RealisticMarketDemand.dds ] && zip -X "dist/$MOD.zip" icon_RealisticMarketDemand.dds
           zip -X "dist/$MOD.zip" scripts/*.lua
           if [ -d l10n ]; then zip -r -X "dist/$MOD.zip" l10n; fi

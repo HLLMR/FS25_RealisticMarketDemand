@@ -36,9 +36,10 @@ Write-Host "  version: $version"
 # --- Assemble the include list (allowlist): @{ src; entry } -----------------
 # entry paths use forward slashes so the archive is correct on Linux dedicated
 # servers and mod tooling, not just Windows.
+# NOTE: LICENSE is intentionally NOT bundled — the game doesn't load it, so the
+# TestRunner's ObsoleteFiles module flags it. It stays in the repo (GitHub).
 $files = @()
-$files += @{ src = $modDescPath;                 entry = 'modDesc.xml' }
-$files += @{ src = (Join-Path $root 'LICENSE');   entry = 'LICENSE' }
+$files += @{ src = $modDescPath; entry = 'modDesc.xml' }
 
 Get-ChildItem (Join-Path $root 'scripts') -Filter '*.lua' -File | ForEach-Object {
     $files += @{ src = $_.FullName; entry = "scripts/$($_.Name)" }

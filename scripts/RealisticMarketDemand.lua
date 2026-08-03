@@ -43,6 +43,16 @@ RealisticMarketDemand.PENALTY_MIN_AMOUNT = 1
 function RealisticMarketDemand:loadMap(filename)
     RMDLogging.info("Starting up (mod '%s')", tostring(RealisticMarketDemand.MOD_NAME))
 
+    -- v1.0: demand pricing is a single-player feature. In multiplayer the mod
+    -- loads but stays inactive (no hooks, no state) — clients can't be sent the
+    -- server-side demand yet, so leaving it active would desync their price
+    -- displays. Full multiplayer support is planned for a later version.
+    if g_currentMission ~= nil and g_currentMission.missionDynamicInfo ~= nil
+        and g_currentMission.missionDynamicInfo.isMultiplayer then
+        RMDLogging.info("Multiplayer game detected; demand pricing is single-player only in this version. Mod inactive.")
+        return
+    end
+
     self.isServer = g_currentMission ~= nil and g_currentMission:getIsServer()
     if not self.isServer then
         RMDLogging.info("Not the server; demand state will not be tracked here")

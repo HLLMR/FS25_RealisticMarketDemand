@@ -6,9 +6,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-08-02
+## [1.0.0] - 2026-08-02
 
-First release. Single-player, PC only.
+First release. Single-player feature; multiplayer-compatible (loads but stays
+inactive in MP). PC only. Passes the GIANTS TestRunner (0.9.19).
 
 ### Added
 - **Demand-based selling prices.** Demand is tracked per selling station and fill
@@ -33,8 +34,10 @@ First release. Single-player, PC only.
 
 ### Notes
 - Layers on top of the base game's dynamic pricing rather than replacing it.
+- Demand pricing runs in single-player only; in multiplayer the mod loads but
+  stays inactive (full MP support is planned for a later version).
 - General economy rebalancing (e.g. a wholesale/retail spread) is intentionally
   out of scope — left to dedicated economy mods for compatibility.
 
-[Unreleased]: https://github.com/HLLMR/FS25_RealisticMarketDemand/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/HLLMR/FS25_RealisticMarketDemand/releases/tag/v0.1.0
+[Unreleased]: https://github.com/HLLMR/FS25_RealisticMarketDemand/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/HLLMR/FS25_RealisticMarketDemand/releases/tag/v1.0.0
