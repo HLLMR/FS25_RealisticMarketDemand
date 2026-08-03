@@ -9,8 +9,8 @@ appetite**. As you keep dumping the same crop at the same selling station, the
 price it pays **gradually falls** — flooding a market crashes its price. Spread
 sales across stations, across crops, or across months and you keep prices high.
 
-> **Status: v0.1 — early release.** Single-player only, no custom menu yet.
-> Balancing values are first-pass; feedback very welcome.
+> **Status: v1.0.0 — initial public release.** Single-player only. Balancing
+> values are first-pass; feedback very welcome.
 
 ## See it in action
 
@@ -96,9 +96,8 @@ price to that floor. Tweak the numbers at the top of `scripts/DemandModel.lua`
 ## Compatibility
 
 - **Farming Simulator 25** (PC).
-- **Single-player feature.** The mod is multiplayer-compatible — it loads in MP
-  but stays inactive there (demand pricing applies in single-player only). Full
-  MP support is planned for a later version.
+- **Single-player only. Multiplayer is not supported in this version** (full MP
+  support is planned for a later version).
 - Coexists with the base game's dynamic pricing and "great demand" events.
 - Should be compatible with most maps and selling stations, since it hooks the
   standard `SellingStation` class rather than any specific map. Conflicts are
