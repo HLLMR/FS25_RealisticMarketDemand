@@ -191,6 +191,9 @@ end
 -- aggregate, so it must be called once per unload, not per tick.
 -- @param number dt frame delta in ms (unused; debounced on g_time)
 function RealisticMarketDemand:update(dt)
+    -- Cheap poll so a mid-game economic-difficulty change takes effect live.
+    self:applyEconomicDifficulty()
+
     if self.pendingPenalty == nil then
         return
     end
@@ -235,8 +238,9 @@ end
 
 --- Apply the demand preset that matches the savegame's economic difficulty
 -- (1=easy, 2=normal, 3=hard). No separate setting or persistence needed — the
--- game already stores the economic difficulty per savegame. Safe to call
--- repeatedly; only logs when the applied difficulty changes.
+-- game already stores the economic difficulty per savegame, and it can be changed
+-- in-game, so this is polled cheaply from update(). Early-returns (no work) when
+-- the difficulty is unchanged; logs only on an actual change.
 function RealisticMarketDemand:applyEconomicDifficulty()
     if self.model == nil then
         return
@@ -248,18 +252,18 @@ function RealisticMarketDemand:applyEconomicDifficulty()
         difficulty = g_currentMission.missionInfo.economicDifficulty
     end
     difficulty = DemandModel.clamp(difficulty, 1, #DemandModel.PRESETS)
+    if difficulty == self.appliedDifficulty then
+        return
+    end
 
     local preset = DemandModel.PRESETS[difficulty]
     if preset == nil then
         return
     end
     self.model:applyPreset(preset.key)
-
-    if self.appliedDifficulty ~= difficulty then
-        self.appliedDifficulty = difficulty
-        RMDLogging.info("Economic difficulty %d -> '%s' preset (floor=%.2f, litersForFullDrop=%d)",
-            difficulty, preset.key, self.model.priceFloor, self.model.litersForFullDrop)
-    end
+    self.appliedDifficulty = difficulty
+    RMDLogging.info("Economic difficulty %d -> '%s' preset (floor=%.2f, litersForFullDrop=%d)",
+        difficulty, preset.key, self.model.priceFloor, self.model.litersForFullDrop)
 end
 
 --- Absolute path of this mod's per-savegame demand file, or nil if unavailable.

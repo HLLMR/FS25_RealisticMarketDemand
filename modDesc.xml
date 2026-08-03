@@ -10,19 +10,37 @@
     <description>
         <en>
             <![CDATA[
-Tracks buyer demand per selling station and fill type, and reduces the
-effective sale price as demand is consumed within a monthly period. Prices
-recover when a new period begins.
+Buyers have a finite monthly appetite. Sell too much of one crop at one selling
+station and its price steadily drops - flooding a market crashes it. Spread your
+sales across stations, crops, or months to keep prices high.
 
-Version 0.1:
-- Single-player.
-- Monthly demand periods.
-- Demand tracked by sell station and fill type.
-- Continuous price multiplier (no hard sale caps).
-- XML save/load per savegame.
-- Console/log diagnostics prefixed with [RealisticMarketDemand].
+- Demand tracked per selling station and fill type
+- Continuous price drop (no hard sell cap); recovers each in-game month
+- "Saturated market" penalty shown in the income HUD
+- Strength scales with your savegame's economic difficulty (Easy/Normal/Hard)
+- Saved with your game
+- Single-player. PC only.
+
+Open source: https://github.com/HLLMR/FS25_RealisticMarketDemand
 ]]>
         </en>
+        <de>
+            <![CDATA[
+Käufer haben einen begrenzten monatlichen Bedarf. Wer zu viel einer Frucht an
+einer Verkaufsstelle ablädt, drückt dort den Preis - ein überschwemmter Markt
+lässt den Preis einbrechen. Verteile deine Verkäufe auf mehrere Stationen,
+Früchte oder Monate, um die Preise hoch zu halten.
+
+- Nachfrage pro Verkaufsstelle und Fruchttyp
+- Kontinuierlicher Preisverfall (keine harte Verkaufsgrenze); erholt sich jeden Ingame-Monat
+- "Gesättigter Markt"-Abzug im Einnahmen-HUD
+- Stärke richtet sich nach dem wirtschaftlichen Schwierigkeitsgrad des Spielstands (Leicht/Normal/Schwer)
+- Wird mit dem Spielstand gespeichert
+- Einzelspieler. Nur PC.
+
+Open Source: https://github.com/HLLMR/FS25_RealisticMarketDemand
+]]>
+        </de>
     </description>
 
     <iconFilename>icon_RealisticMarketDemand.dds</iconFilename>
@@ -42,6 +60,7 @@ Version 0.1:
     <l10n>
         <text name="rmd_saturatedMarket">
             <en>Saturated market</en>
+            <de>Gesättigter Markt</de>
         </text>
     </l10n>
 

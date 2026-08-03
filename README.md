@@ -72,7 +72,8 @@ This layers on top of the game's own dynamic pricing; it doesn't replace it.
 ## Difficulty
 
 The strength of the effect follows your savegame's **economic difficulty** — no
-separate setting to manage. Harder economy, harsher saturation:
+separate setting to manage, and it adjusts live if you change the difficulty
+in-game. Harder economy, harsher saturation:
 
 | Economic difficulty | Price floor | Liters to reach the floor |
 |---------------------|-------------|---------------------------|

@@ -3,20 +3,18 @@
 
 The icon is drawn procedurally with Pillow — no AI-generated or externally
 sourced imagery — so it satisfies ModHub's imagery rules and is fully
-reproducible. Rendered at 4x and downscaled for clean edges, saved as 256x256
-DXT5 DDS (what the GIANTS engine loads) plus a PNG source under media/.
+reproducible. Output matches the GIANTS ModHub ModIcon spec: 512x512, BC1 (DXT1),
+no mipmaps, opaque (full-square background). Rendered at 4x and downscaled.
 
 Usage:  python tools/gen_icon.py
 Requires: Pillow (`pip install Pillow`).
-
-For the official ModHub icon frame you can run media/icon-source.png through
-GIANTS FSIconGenerator; this procedural icon is fine for use as-is otherwise.
 """
 import os
 from PIL import Image, ImageDraw, ImageFont
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-S = 1024  # supersample size; downscaled to 256
+S = 2048          # supersample size; downscaled to OUT
+OUT = 512         # ModHub ModIcon size
 
 
 def lerp(a, b, t):
@@ -24,23 +22,18 @@ def lerp(a, b, t):
 
 
 def build():
-    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-
-    # Rounded panel with a vertical green -> black gradient.
+    # Opaque full-square vertical gradient background (green -> near-black).
     top, bot = (18, 46, 32), (6, 14, 10)
-    grad = Image.new("RGB", (1, S))
+    img = Image.new("RGB", (S, S))
     for y in range(S):
-        grad.putpixel((0, y), lerp(top, bot, y / S))
-    grad = grad.resize((S, S))
-    radius = int(S * 0.18)
-    mask = Image.new("L", (S, S), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, S - 1, S - 1], radius=radius, fill=255)
-    img.paste(grad, (0, 0), mask)
-
+        ImageDraw.Draw(img).line([(0, y), (S, y)], fill=lerp(top, bot, y / S))
+    img = img.convert("RGBA")
     draw = ImageDraw.Draw(img)
+
+    # Subtle rounded inner border (visual only; background stays opaque).
     draw.rounded_rectangle(
-        [int(S * 0.03)] * 2 + [int(S * 0.97)] * 2,
-        radius=int(radius * 0.85), outline=(120, 200, 150, 90), width=int(S * 0.012))
+        [int(S * 0.05)] * 2 + [int(S * 0.95)] * 2,
+        radius=int(S * 0.10), outline=(120, 200, 150, 110), width=int(S * 0.010))
 
     # Descending bars: demand crushing the price, left (high) to right (low).
     bar_colors = [(76, 200, 120), (120, 205, 90), (210, 190, 70), (225, 140, 60), (215, 80, 70)]
@@ -76,7 +69,7 @@ def build():
                       font=ImageFont.truetype(fp, int(S * 0.20)), fill=(210, 255, 225, 235))
             break
 
-    return img.resize((256, 256), Image.LANCZOS)
+    return img.convert("RGB").resize((OUT, OUT), Image.LANCZOS)
 
 
 def main():
@@ -87,10 +80,11 @@ def main():
     print("PNG source ->", png)
 
     dds = os.path.join(REPO, "icon_RealisticMarketDemand.dds")
-    for pf in ("DXT5", "DXT1"):
+    # ModHub ModIcon = BC1 (DXT1), no mipmaps.
+    for pf in ("DXT1", "DXT5"):
         try:
             icon.save(dds, format="DDS", pixel_format=pf)
-            print(f"DDS ({pf}) -> {dds}")
+            print(f"DDS ({pf}, {OUT}x{OUT}) -> {dds}")
             return
         except Exception as e:  # noqa: BLE001
             print(f"DDS {pf} failed: {e}")
