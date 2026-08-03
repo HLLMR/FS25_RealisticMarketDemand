@@ -16,8 +16,6 @@
         "FSCareerMissionInfo",
         "FillType",
         "MoneyType",
-        "MultiTextOptionElement",
-        "RMDSettings",
         "createXMLFile",
         "loadXMLFile",
         "saveXMLFile",

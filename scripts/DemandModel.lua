@@ -23,18 +23,20 @@ local DemandModel_mt = { __index = DemandModel }
 -- Default tuning matches the "normal" preset below. litersForFullDrop is "how
 -- many liters of one fill type sold at one station, within one month, drives the
 -- price to the floor".
-DemandModel.DEFAULT_PRICE_FLOOR = 0.45
-DemandModel.DEFAULT_LITERS_FOR_FULL_DROP = 70000
+DemandModel.DEFAULT_PRICE_FLOOR = 0.50
+DemandModel.DEFAULT_LITERS_FOR_FULL_DROP = 150000
 
--- Difficulty presets exposed in the settings menu. Ordered easy -> hard. `floor`
--- is the lowest price fraction a saturated market pays; `litersForFullDrop` is
--- how much of one crop at one station reaches that floor within a month.
+-- Presets driven by the savegame's economic difficulty (1=easy, 2=normal,
+-- 3=hard), so the array index matches missionInfo.economicDifficulty directly.
+-- `floor` is the lowest price fraction a saturated market pays; `litersForFullDrop`
+-- is how much of one crop at one station reaches that floor within a month.
 DemandModel.PRESETS = {
-    { key = "easy",   floor = 0.60, litersForFullDrop = 120000 },
-    { key = "normal", floor = 0.45, litersForFullDrop = 70000 },
-    { key = "hard",   floor = 0.30, litersForFullDrop = 40000 },
+    { key = "easy",   floor = 0.60, litersForFullDrop = 300000 },
+    { key = "normal", floor = 0.50, litersForFullDrop = 150000 },
+    { key = "hard",   floor = 0.40, litersForFullDrop = 75000 },
 }
 DemandModel.DEFAULT_PRESET = "normal"
+DemandModel.DEFAULT_PRESET_INDEX = 2  -- matches economicDifficulty for "normal"
 
 --- Look up a preset by key.
 -- @param string key "easy" | "normal" | "hard"

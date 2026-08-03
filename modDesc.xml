@@ -36,25 +36,12 @@ Version 0.1:
         <sourceFile filename="scripts/DemandModel.lua"/>
         <sourceFile filename="scripts/DemandStore.lua"/>
         <sourceFile filename="scripts/MarketDemandHooks.lua"/>
-        <sourceFile filename="scripts/RMDSettings.lua"/>
         <sourceFile filename="scripts/RealisticMarketDemand.lua"/>
     </extraSourceFiles>
 
     <l10n>
         <text name="rmd_saturatedMarket">
             <en>Saturated market</en>
-        </text>
-        <text name="rmd_settingTitle">
-            <en>Market demand saturation</en>
-        </text>
-        <text name="rmd_presetEasy">
-            <en>Easy</en>
-        </text>
-        <text name="rmd_presetNormal">
-            <en>Normal</en>
-        </text>
-        <text name="rmd_presetHard">
-            <en>Hard</en>
         </text>
     </l10n>
 

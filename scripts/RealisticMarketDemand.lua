@@ -56,10 +56,11 @@ function RealisticMarketDemand:loadMap(filename)
     self.warnedMissingKey = false
     self.loaded = false
 
-    -- Difficulty preset (settings menu). Applied to the model now; overridden by
-    -- the saved value once ensureLoaded() restores it.
-    self.presetKey = DemandModel.DEFAULT_PRESET
-    self.model:applyPreset(self.presetKey)
+    -- Difficulty is taken from the savegame's economic difficulty (no separate
+    -- setting to manage). missionInfo may not be fully ready here, so this is
+    -- re-applied in ensureLoaded() as well.
+    self.appliedDifficulty = nil
+    self:applyEconomicDifficulty()
 
     -- Register a display-only finance category so the money lost to saturation
     -- shows as its own labelled line in the income HUD (next to "Harvest Income").
@@ -85,12 +86,6 @@ function RealisticMarketDemand:loadMap(filename)
     MarketDemandHooks.install(self)
 
     self:installSaveHook()
-
-    -- Inject the difficulty setting into the in-game settings menu. Self-contained
-    -- and defensive: a failure here never affects the demand mechanic itself.
-    if RMDSettings ~= nil then
-        RMDSettings.install(self)
-    end
 
     RMDLogging.info("Startup complete (floor=%.2f, litersForFullDrop=%d)",
         self.model.priceFloor, self.model.litersForFullDrop)
@@ -233,43 +228,37 @@ function RealisticMarketDemand:ensureLoaded()
     self.store:loadFromFile(savePath)
     self.loaded = true
 
-    -- Restore the saved difficulty preset (if any) and apply it to the model.
-    if self.store.presetKey ~= nil and DemandModel.getPresetByKey(self.store.presetKey) ~= nil then
-        self.presetKey = self.store.presetKey
-        self.model:applyPreset(self.presetKey)
-        RMDLogging.info("Restored difficulty preset: %s (floor=%.2f, litersForFullDrop=%d)",
-            self.presetKey, self.model.priceFloor, self.model.litersForFullDrop)
-    else
-        self.store.presetKey = self.presetKey
-    end
+    -- missionInfo is fully populated by now; make sure the difficulty preset is
+    -- applied from the savegame's economic difficulty.
+    self:applyEconomicDifficulty()
 end
 
---- Current difficulty preset key. @return string
-function RealisticMarketDemand:getPreset()
-    return self.presetKey or DemandModel.DEFAULT_PRESET
-end
-
---- Set the difficulty preset (from the settings menu): apply to the model live
--- and persist to the savegame. Server-authoritative.
--- @param string key "easy" | "normal" | "hard"
-function RealisticMarketDemand:setPreset(key)
-    if DemandModel.getPresetByKey(key) == nil then
+--- Apply the demand preset that matches the savegame's economic difficulty
+-- (1=easy, 2=normal, 3=hard). No separate setting or persistence needed — the
+-- game already stores the economic difficulty per savegame. Safe to call
+-- repeatedly; only logs when the applied difficulty changes.
+function RealisticMarketDemand:applyEconomicDifficulty()
+    if self.model == nil then
         return
     end
-    self.presetKey = key
-    self.model:applyPreset(key)
-    if self.store ~= nil then
-        self.store.presetKey = key
-    end
-    RMDLogging.info("Difficulty preset set to '%s' (floor=%.2f, litersForFullDrop=%d)",
-        key, self.model.priceFloor, self.model.litersForFullDrop)
 
-    -- Persist immediately so the choice survives even without a manual save.
-    if self.isServer then
-        local savePath = self:getSavePath()
-        if savePath ~= nil and self.store ~= nil then
-            self.store:saveToFile(savePath)
-        end
+    local difficulty = DemandModel.DEFAULT_PRESET_INDEX
+    if g_currentMission ~= nil and g_currentMission.missionInfo ~= nil
+        and g_currentMission.missionInfo.economicDifficulty ~= nil then
+        difficulty = g_currentMission.missionInfo.economicDifficulty
+    end
+    difficulty = DemandModel.clamp(difficulty, 1, #DemandModel.PRESETS)
+
+    local preset = DemandModel.PRESETS[difficulty]
+    if preset == nil then
+        return
+    end
+    self.model:applyPreset(preset.key)
+
+    if self.appliedDifficulty ~= difficulty then
+        self.appliedDifficulty = difficulty
+        RMDLogging.info("Economic difficulty %d -> '%s' preset (floor=%.2f, litersForFullDrop=%d)",
+            difficulty, preset.key, self.model.priceFloor, self.model.litersForFullDrop)
     end
 end
 

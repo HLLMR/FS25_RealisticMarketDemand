@@ -69,18 +69,22 @@ This layers on top of the game's own dynamic pricing; it doesn't replace it.
 
 **From source (developers)** — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Configuration
+## Difficulty
 
-v0.1 ships with sensible defaults. The two main tuning values live at the top of
-`scripts/DemandModel.lua`:
+The strength of the effect follows your savegame's **economic difficulty** — no
+separate setting to manage. Harder economy, harsher saturation:
 
-| Value | Default | Meaning |
-|-------|---------|---------|
-| `DEFAULT_PRICE_FLOOR` | `0.40` | Lowest fraction of normal price a fully-saturated market pays. |
-| `DEFAULT_LITERS_FOR_FULL_DROP` | `60000` | Liters of one crop sold at one station in a month to reach the floor. |
+| Economic difficulty | Price floor | Liters to reach the floor |
+|---------------------|-------------|---------------------------|
+| Easy   | 0.60 | 300,000 L |
+| Normal | 0.50 | 150,000 L |
+| Hard   | 0.40 | 75,000 L |
 
-An in-game settings menu is planned for a later version. To see per-sale math in
-the log, set `RMDLogging.debugEnabled = true` in `scripts/RMDLogging.lua`.
+`floor` = lowest fraction of normal price a fully-saturated market pays; the
+liters column = how much of one crop at one station (within a month) drives the
+price to that floor. Tweak the numbers at the top of `scripts/DemandModel.lua`
+(`PRESETS`) if you want. To see per-sale math in the log, set
+`RMDLogging.debugEnabled = true` in `scripts/RMDLogging.lua`.
 
 ## Compatibility
 
