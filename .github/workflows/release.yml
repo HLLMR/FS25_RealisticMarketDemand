@@ -24,6 +24,42 @@ jobs:
         id: tag
         run: echo "name=${{ github.event.inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
 
+      - name: Set up Lua 5.1
+        run: sudo apt-get update && sudo apt-get install -y lua5.1
+
+      - name: Release gates (fail closed)
+        run: |
+          set -euo pipefail
+          fail=0
+
+          # modDesc.xml well-formed
+          python3 -c "import xml.dom.minidom; xml.dom.minidom.parse('modDesc.xml')" \
+            && echo "ok: modDesc.xml well-formed" || { echo "FAIL: modDesc.xml malformed"; fail=1; }
+
+          # Lua syntax + unit tests
+          for f in scripts/*.lua tests/*.lua; do lua5.1 -e "assert(loadfile('$f'))"; done
+          echo "ok: Lua syntax"
+          for t in tests/*.test.lua; do lua5.1 "$t" >/dev/null; done
+          echo "ok: unit tests"
+
+          # Tag (vX.Y.Z) must match modDesc <version> a.b.c.0
+          tag="${{ steps.tag.outputs.name }}"; tagv="${tag#v}"
+          desc=$(grep -oE '<version>[0-9.]+</version>' modDesc.xml | grep -oE '[0-9.]+')
+          if [ "$desc" != "$tagv.0" ] && [ "$desc" != "$tagv" ]; then
+            echo "FAIL: tag $tag vs modDesc version $desc mismatch"; fail=1
+          else echo "ok: tag/version agree ($tag ~ $desc)"; fi
+
+          # Debug logging must be off
+          if grep -qE 'RMDLogging\.debugEnabled\s*=\s*true' scripts/RMDLogging.lua; then
+            echo "FAIL: RMDLogging.debugEnabled = true"; fail=1
+          else echo "ok: debug logging off"; fi
+
+          # Icon present
+          [ -f icon_RealisticMarketDemand.dds ] && echo "ok: icon present" \
+            || { echo "FAIL: icon missing"; fail=1; }
+
+          [ "$fail" -eq 0 ] || { echo "Release gates failed."; exit 1; }
+
       - name: Build ModHub-ready zip (modDesc.xml at root, runtime files only)
         run: |
           set -euo pipefail

@@ -1,7 +1,6 @@
 # ModHub submission copy
 
-Paste-ready text for the ModHub listing. Keep it accurate — under-promise. Fill
-the two `TODO` links before submitting.
+Paste-ready text for the ModHub listing. Keep it accurate — under-promise.
 
 ---
 
@@ -43,7 +42,7 @@ tuning menu is planned for a future update.
 **Open source** — code, issues, and contributions:
 https://github.com/HLLMR/FS25_RealisticMarketDemand
 
-Support: TODO — HLLMR Discord invite link.
+Support / bug reports: https://github.com/HLLMR/FS25_RealisticMarketDemand/issues
 
 By HLLMR.
 

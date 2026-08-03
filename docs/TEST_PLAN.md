@@ -17,9 +17,9 @@ per-sale `SALE …` lines appear; set it back to `false` before packaging.
 | # | Action | Pass criteria |
 |---|--------|---------------|
 | 1.1 | Drive to a selling station, open its price list for one crop (e.g. wheat), note the per-liter price | baseline recorded |
-| 1.2 | Sell a load of that crop at that station | `SALE station=… fill=WHEAT liters=… paid=… perLiterPaid=… mult=…` appears; `mult` < 1.0 after the first load |
-| 1.3 | Sell several more loads of the same crop at the **same** station | `perLiterPaid` decreases across sales; `mult` trends toward the 0.55 floor; `consumed` accumulates |
-| 1.4 | Compare `perLiterPaid` ratios between two sales to their `mult` ratio | ratios match → **money paid reflects the demand multiplier (price-linkage confirmed)** |
+| 1.2 | Sell a load of that crop at that station | `SALE station=… fill=WHEAT liters=… paid=… mult=… consumed=…` appears; `mult` < 1.0 after the first load |
+| 1.3 | Sell several more loads of the same crop at the **same** station | `paid / liters` decreases across sales; `mult` trends toward the difficulty floor (Normal 0.50); `consumed` accumulates |
+| 1.4 | Compare `paid / liters` ratios between two sales to their `mult` ratio | ratios match → **money paid reflects the demand multiplier (price-linkage confirmed)** |
 | 1.5 | Check the same crop at a **different** station | unaffected (independent demand) |
 | 1.6 | Check a **different** crop at the same station | unaffected (independent demand) |
 

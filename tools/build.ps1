@@ -12,9 +12,16 @@
     the zip name must stay exactly FS25_RealisticMarketDemand.zip for the game to
     recognize the mod. Fix blockers before submitting to ModHub.
 
+.PARAMETER AllowDevBuild
+    Build even when release-readiness checks fail (for local iteration). Without
+    it, a failed check exits non-zero so the build fails closed.
+
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File tools\build.ps1
+    powershell -ExecutionPolicy Bypass -File tools\build.ps1 -AllowDevBuild
 #>
+
+param([switch]$AllowDevBuild)
 
 $ErrorActionPreference = 'Stop'
 
@@ -100,6 +107,9 @@ $allOk = (Check (-not $debugOn) 'debug logging OFF (RMDLogging.debugEnabled = fa
 
 if ($allOk) {
     Write-Host "`nModHub-ready." -ForegroundColor Green
+} elseif ($AllowDevBuild) {
+    Write-Host "`nDev build (-AllowDevBuild) - resolve [FAIL] items before submitting to ModHub." -ForegroundColor Yellow
 } else {
-    Write-Host "`nDev build only - resolve [FAIL] items before submitting to ModHub." -ForegroundColor Yellow
+    Write-Host "`nRelease readiness FAILED - fix the [FAIL] items, or pass -AllowDevBuild for local iteration." -ForegroundColor Red
+    exit 1
 }

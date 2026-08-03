@@ -351,14 +351,24 @@ function RealisticMarketDemand:getStationKey(station)
         end
     end
 
-    -- Fallback: station name. Less robust across sessions; warn once so the
-    -- reason for any demand "reset" after reload is visible in the log.
+    -- Fallback: station name plus its rounded world position, so two sell points
+    -- that share a display name don't collapse into one demand pool. Warn once so
+    -- any demand "reset" after reload is explainable from the log.
     if station.stationName ~= nil then
         if not self.warnedMissingKey then
-            RMDLogging.warn("A selling station has no placeable uniqueId; falling back to name keys")
+            RMDLogging.warn("A selling station has no placeable uniqueId; falling back to name+position keys")
             self.warnedMissingKey = true
         end
-        return "name:" .. tostring(station.stationName)
+
+        local suffix = ""
+        local node = placeable ~= nil and placeable.rootNode or nil
+        if node ~= nil and getWorldTranslation ~= nil then
+            local x, _, z = getWorldTranslation(node)
+            if type(x) == "number" and type(z) == "number" then
+                suffix = string.format("@%d,%d", math.floor(x + 0.5), math.floor(z + 0.5))
+            end
+        end
+        return "name:" .. tostring(station.stationName) .. suffix
     end
 
     return nil

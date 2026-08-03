@@ -25,5 +25,18 @@ jobs:
       - name: Set up Lua 5.1
         run: sudo apt-get update && sudo apt-get install -y lua5.1
 
-      - name: Run pure-math unit tests
-        run: lua5.1 tests/DemandModel.test.lua
+      - name: Lua syntax check (all scripts + tests)
+        run: |
+          set -e
+          for f in scripts/*.lua tests/*.lua; do
+            lua5.1 -e "assert(loadfile('$f'))"
+            echo "ok: $f"
+          done
+
+      - name: Run unit tests
+        run: |
+          set -e
+          for t in tests/*.test.lua; do
+            echo "== $t =="
+            lua5.1 "$t"
+          done

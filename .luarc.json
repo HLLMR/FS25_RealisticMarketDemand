@@ -11,6 +11,7 @@
         "g_fillTypeManager",
         "g_i18n",
         "g_time",
+        "getWorldTranslation",
         "SellingStation",
         "UnloadingStation",
         "FSCareerMissionInfo",

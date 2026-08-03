@@ -1,19 +1,22 @@
 # Roadmap
 
-Post-v0.1 direction. The issue drafts below are paste-ready for GitHub (the CLI
-`gh` isn't available in the dev environment, so they aren't auto-created). Create
-a **v0.2 milestone** and open these under it.
+The issue drafts below are paste-ready for GitHub. Create a **next milestone** and
+open them under it.
 
-## v0.1 (current) — demand saturation
+## v1.0.0 (released) — demand saturation
 
-Shipped/working: per-station, per-fillType demand; continuous price multiplier
-with monthly recovery; XML persistence; saturated-market penalty line in the
-finance HUD; procedural icon. Remaining before ModHub: flip debug off, three
-screenshots.
+Shipped: per-station, per-fillType demand keyed on an absolute period id;
+continuous price multiplier with monthly recovery; XML persistence;
+saturated-market penalty line in the finance HUD; difficulty scaling tied to the
+savegame's economic difficulty; procedural icon; EN/DE descriptions. Passes the
+GIANTS TestRunner (single-player; multiplayer declared unsupported).
 
-## v0.2 — configurability & multiplayer
+## Next — multiplayer & tuning depth
 
-Two headline features, plus a couple of smaller follow-ups.
+Headline: real multiplayer support. Plus a couple of smaller follow-ups. (The
+"in-game settings menu" idea below is largely **superseded** — difficulty now
+follows the savegame's economic difficulty automatically — but a menu could still
+expose finer control later.)
 
 ---
 
