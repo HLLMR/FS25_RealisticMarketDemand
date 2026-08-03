@@ -97,8 +97,8 @@ function RealisticMarketDemand:loadMap(filename)
 
     self:installSaveHook()
 
-    RMDLogging.info("Startup complete (floor=%.2f, litersForFullDrop=%d)",
-        self.model.priceFloor, self.model.litersForFullDrop)
+    RMDLogging.info("Startup complete (floor=%.2f, litersForFullDrop=%d, periodId=%d)",
+        self.model.priceFloor, self.model.litersForFullDrop, self:getCurrentPeriod())
 end
 
 --- Called by the mod event system when the map is unloaded.
@@ -313,6 +313,14 @@ function RealisticMarketDemand:installSaveHook()
         return
     end
 
+    -- Guard against stacking a second wrapper if loadMap runs again (e.g. loading
+    -- another savegame in the same session). Marker lives on the class, so it
+    -- survives across mission loads.
+    if FSCareerMissionInfo.rmdSaveHookInstalled then
+        return
+    end
+    FSCareerMissionInfo.rmdSaveHookInstalled = true
+
     FSCareerMissionInfo.saveToXMLFile = Utils.appendedFunction(
         FSCareerMissionInfo.saveToXMLFile,
         function(...)
@@ -366,17 +374,34 @@ function RealisticMarketDemand:getFillTypeName(fillTypeIndex)
     return g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
 end
 
---- Current monthly demand period (1..12), defaulting to 1 if unavailable.
--- @return number period
+--- Absolute, monotonically-increasing id for the current demand period.
+-- IMPORTANT: this must NOT repeat annually. The seasonal period number (1..12,
+-- month of year) does repeat, which would make demand from period 8 last year
+-- look "current" again in period 8 this year. We instead key on the absolute
+-- game-day the current period started (`currentDay - currentDayInPeriod`), which
+-- increases forever and never repeats.
+-- @return number periodId a value constant within a period, unique across years
 function RealisticMarketDemand:getCurrentPeriod()
     local env = g_currentMission ~= nil and g_currentMission.environment or nil
-    if env ~= nil and env.getPeriodAndAlphaIntoPeriod ~= nil then
-        local period = env:getPeriodAndAlphaIntoPeriod()
-        if period ~= nil then
-            return period
-        end
+    if env == nil then
+        return 0
     end
-    return 1
+
+    -- Preferred: the absolute day the current period began. currentDay is a
+    -- lifetime day counter (does not reset each year).
+    if type(env.currentDay) == "number" and type(env.currentDayInPeriod) == "number" then
+        return env.currentDay - env.currentDayInPeriod
+    end
+
+    -- Fallbacks that stay monotonic (resetting demand per day is degraded but
+    -- safe; it never brings back last year's saturation).
+    if type(env.currentMonotonicDay) == "number" then
+        return env.currentMonotonicDay
+    end
+    if type(env.currentDay) == "number" then
+        return env.currentDay
+    end
+    return 0
 end
 
 -- Register the single bootstrap instance with the mod event system. This is the
