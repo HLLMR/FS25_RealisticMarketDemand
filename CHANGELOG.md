@@ -53,9 +53,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   mult ~0.72. Consider a lower `litersForFullDrop` and/or floor to make the
   effect more noticeable (pending a tuning pass).
 
+### Added
+- Mod icon `icon_RealisticMarketDemand.dds` (256×256 DXT5), generated
+  procedurally by `tools/gen_icon.py`.
+
 ### To do before release
-- Add a real `icon_RealisticMarketDemand.dds` (referenced by `modDesc.xml`).
 - Set `RMDLogging.debugEnabled` back to `false`.
+- Capture the three ModHub screenshots (guidance in `docs/SCREENSHOTS.md`).
 
 ## [0.1.0] - 2026-07-14
 

@@ -52,8 +52,10 @@ The same crop/station a month later, price recovered toward normal — sells the
 - "…sell across stations and months to keep prices high."
 - "Every station, every crop, tracked independently."
 
-## Also needed (not a screenshot, but a visual asset)
-- **`icon_RealisticMarketDemand.dds`** — the mod icon (currently missing; throws
-  a load error). Use `FSIconGenerator` (in `.giants/utilities/`) from a genuine
-  in-game capture or a simple made-in-editor image. 256×256 DXT-compressed .dds
-  per GIANTS' icon spec.
+## Icon (done)
+- **`icon_RealisticMarketDemand.dds`** is generated procedurally by
+  `tools/gen_icon.py` (256×256 DXT5) — a descending €-marked bar chart with a
+  downward trend arrow. Source PNG: `media/icon-source.png`. Drawn in code (no
+  AI/external imagery). Regenerate with `python tools/gen_icon.py`. For the
+  official GIANTS icon frame, optionally run the PNG through `FSIconGenerator`
+  (in `.giants/utilities/`) before final ModHub submission.
