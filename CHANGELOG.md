@@ -11,9 +11,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   showing the money lost to saturation. Uses a custom `MoneyType.register` finance
   category plus display-only `g_currentMission:addMoneyChange` — which does NOT
   change the balance (already reduced by the price hook), so no double-charge.
-  Per-tick calls of the same money type auto-aggregate into one line, so no
-  debounce is needed. (Replaced the earlier center-screen `showBlinkingWarning`
-  toast, which fired but was easy to miss and in the wrong place.)
+  `addMoneyChange` does NOT auto-aggregate (per-tick calls stack a line each), so
+  the penalty is accumulated per farm across an unload and flushed to ONE line
+  once the flow goes idle (~1.2s debounce). (Replaced the earlier center-screen
+  `showBlinkingWarning` toast, which fired but was easy to miss and in the wrong
+  place.)
 
 ### Changed
 - Punchier default tuning so the effect is actually felt: price floor 0.55 → 0.40
