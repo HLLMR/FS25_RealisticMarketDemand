@@ -21,3 +21,6 @@ luacov.report.out
 # Local notes not meant for the repo
 scratch/
 TODO.local.md
+
+# Nexus upload staging (local only: mod zip + assets)
+nexus-upload/
